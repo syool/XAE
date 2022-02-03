@@ -24,7 +24,7 @@ if __name__ == '__main__':
                         help='set length of a frame clip')
     parser.add_argument('--seed', type=int, default=0,
                         help='set seed for random numbers')
-    parser.add_argument('--train', action='store_const', const='train')
+    parser.add_argument('--train', action='store_const', const='train', default='train')
     parser.add_argument('--inference', action='store_const', const='inference')
     args = parser.parse_args()
 

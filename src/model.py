@@ -1,17 +1,17 @@
 from torch import nn
-from modules import Encoder, Decoder, Memory
+from modules import Encoderx, Decoder, Memoryx
 
 
 class Model(nn.Module):
     def __init__(self, clip_length) -> None:
         super(Model, self).__init__()
-        self.en = Encoder(clip_length)
-        self.de = Decoder()
-        self.me = Memory(512, num_item=20)
+        self.encoder = Encoderx(clip_length)
+        self.decoder = Decoder()
+        self.memory = Memoryx(512, 20, 5)
 
     def forward(self, x):
-        z, skip = self.en(x)
-        z = self.me(z)
-        x = self.de(z, skip)
+        z, skip = self.encoder(x)
+        z = self.memory(z)
+        x = self.decoder(z, skip)
 
         return x

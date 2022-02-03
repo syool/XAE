@@ -1,21 +1,26 @@
+from asyncio import QueueEmpty
 import torch
 from torch import nn
 import torch.nn.functional as F
+import modules.layerx as nx
 
 import math
 
 
-class Memory(nn.Module):
-    def __init__(self, dim, num_item=100) -> None:
-        super(Memory, self).__init__()
+class Memoryx(nn.Module):
+    def __init__(self, dim, num_item, k) -> None:
+        super(Memoryx, self).__init__()
         mempool = nn.Parameter(torch.Tensor(num_item, dim))
-        self.mempool = self.init_memory(mempool)
+        self.init_memory(mempool)
+        
+        self.linear = nx.Linear(512, 20, bias=False)
+        self.linear.weight = mempool
+        
+        self.k = k
         
     def init_memory(self, memory):
         stdv = 1. / math.sqrt(memory.size(1))
         memory.data.uniform_(-stdv, stdv)
-
-        return memory
     
     def memorize(self, input):
         shape = input.shape
@@ -30,11 +35,15 @@ class Memory(nn.Module):
         query = input.view(-1, shape[1])
         
         # == GET ATTENTION VECTORS ==
-        att = F.linear(query, self.mempool) # for LRP, use the attention vector before softmax
-        att = F.softmax(att, dim=1)
+        att = self.linear(query)
+        
+        # == Top-K SELECTION ==
+        val, idx = torch.topk(att, k=self.k, dim=1)
+        val = F.softmax(val, dim=1)
+        att = torch.zeros_like(att).scatter_(1, idx, val)
         
         # == MEMORY SELECTION ==
-        mempool_T = self.mempool.permute(1, 0)
+        mempool_T = self.linear.weight.permute(1, 0)
         output = F.linear(att, mempool_T)
         
         # == RECOVER DIMENSIONALITY ==
