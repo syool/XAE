@@ -1,4 +1,3 @@
-from asyncio import QueueEmpty
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -7,9 +6,9 @@ import modules.layerx as nx
 import math
 
 
-class Memoryx(nn.Module):
+class Memory(nn.Module):
     def __init__(self, dim, num_item, k) -> None:
-        super(Memoryx, self).__init__()
+        super(Memory, self).__init__()
         mempool = nn.Parameter(torch.Tensor(num_item, dim))
         self.init_memory(mempool)
         
@@ -20,16 +19,13 @@ class Memoryx(nn.Module):
         
     def init_memory(self, memory):
         stdv = 1. / math.sqrt(memory.size(1))
-        memory.data.uniform_(-stdv, stdv)
+        memory.data.uniform_(-stdv, stdv)   
     
-    def memorize(self, input):
+    def forward(self, input):
         shape = input.shape
         
         # == GET QUERIES ==
-        if len(shape) == 4:
-            input = input.permute(0, 2, 3, 1)
-        elif len(shape) == 5:
-            input = input.permute(0, 2, 3, 4, 1)
+        input = input.permute(0, 2, 3, 1)
             
         input = input.contiguous()
         query = input.view(-1, shape[1])
@@ -47,16 +43,15 @@ class Memoryx(nn.Module):
         output = F.linear(att, mempool_T)
         
         # == RECOVER DIMENSIONALITY ==
-        if len(shape) == 4:
-            output = output.view(shape[0], shape[2], shape[3], shape[1])
-            output = output.permute(0, 3, 1, 2)
-        if len(shape) == 5:
-            output = output.view(shape[0], shape[2], shape[3], shape[4], shape[1])
-            output = output.permute(0, 4, 1, 2, 3)
+        output = output.view(shape[0], shape[2], shape[3], shape[1])
+        output = output.permute(0, 3, 1, 2)
             
-        return output
-
-    def forward(self, input):
-        output = self.memorize(input)
+        return output, att
+    
+    def relprop(self, R, alpha):
+        # additional inverted sequences -> softmax & topk?
+        R = self.linear.relprop(R, alpha) # invert: self.linear(query)
+        R = R.view(1, 32, 32, 512) # invert: input.view(-1, shape[1])
+        R = R.permute(0, 3, 1, 2) # invert: input.permute(0, 2, 3, 1)
         
-        return output
+        return R

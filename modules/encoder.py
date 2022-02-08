@@ -2,9 +2,9 @@ from torch import nn
 import modules.layerx as nx
 
 
-class Encoderx(nn.Module):
+class Encoder(nn.Module):
     def __init__(self, clip_length) -> None:
-        super(Encoderx, self).__init__()
+        super(Encoder, self).__init__()
         def block(c_in, c_out):
             return nx.Sequential(
                 nx.Conv2d(c_in, c_out, 3, stride=1, padding=1, bias=False),

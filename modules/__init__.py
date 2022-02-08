@@ -1,3 +1,3 @@
-from .encoderx import Encoderx
+from .encoder import Encoder
 from .decoder import Decoder
-from .memoryx import Memoryx
+from .memory import Memory

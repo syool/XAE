@@ -8,7 +8,7 @@ if __name__ == '__main__':
                         help='set PCI bus id')
     parser.add_argument('--dataset', type=str, default='ped2',
                         help='datasets: ped2, avenue, shanghai')
-    parser.add_argument('--epochs', type=int, default=60,
+    parser.add_argument('--epochs', type=int, default=100,
                         help='set number of epochs')
     parser.add_argument('--batch', type=int, default=8,
                         help='set batch size')
@@ -24,8 +24,9 @@ if __name__ == '__main__':
                         help='set length of a frame clip')
     parser.add_argument('--seed', type=int, default=0,
                         help='set seed for random numbers')
-    parser.add_argument('--train', action='store_const', const='train', default='train')
-    parser.add_argument('--inference', action='store_const', const='inference')
+    parser.add_argument('--train', action='store_const', const='train') # default='train'
+    parser.add_argument('--inference', action='store_const', const='inference') # default='inference'
+
     args = parser.parse_args()
 
     if args.train:

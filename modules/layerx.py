@@ -132,24 +132,6 @@ class Cat(RelProp):
             outputs.append(x * c)
 
         return outputs
-
-
-class TopK(RelProp):
-    def forward(self, input, k, dim):
-        self.__setattr__('k', k)
-        self.__setattr__('dim', dim)
-        
-        return torch.topk(input, k, dim)
-    
-    def relprop(self, R, alpha):
-        Z = self.forward(self.X, self.k, self.dim)
-        S = safe_divide(R, Z)
-        C = self.gradprop(Z, self.X, S)
-        
-        # output sequence must be placed here
-        # R = self.X * C
-        
-        return None
         
 
 class Sequential(nn.Sequential):
