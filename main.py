@@ -16,7 +16,7 @@ if __name__ == '__main__':
                         help='set number of cpu cores for dataloader')
     parser.add_argument('--lr', type=float, default=1e-4,
                         help='set learning rate')
-    parser.add_argument('--log_path', type=str, default='./logs',
+    parser.add_argument('--log_path', type=str, default='/home/user/Downloads/xae_logs',
                         help='set path to read/write log files')
     parser.add_argument('--data_path', type=str, default='/home/user/Documents/VADSET',
                         help='set path to datasets')
