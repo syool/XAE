@@ -1,10 +1,12 @@
 import torch
+from torch.autograd import Variable
 
 import numpy as np
 from glob import glob
 import math
 import random
 import imageio
+import matplotlib.cm
 
 import os
 
@@ -93,12 +95,13 @@ def hm_to_rgb(R, scaling = 3, cmap = 'bwr', normalize = True):
     return rgb
 
 
-def visualize(relevances, img_name, method, data_name, dir):
+def visualize(relevances, dir, vid_idx, frame_idx):
     # visualize the relevance
-    n = len(relevances)
-    heatmap = np.sum(relevances.reshape([n, 224, 224, 1]), axis=3)
+    heatmap = np.sum(relevances, axis=3)
     heatmaps = []
-    for h, heat in enumerate(heatmap):
+    for heat in heatmap:
         maps = (hm_to_rgb(heat, scaling=3, cmap='seismic')*255).astype(np.uint8)
         heatmaps.append(maps)
-        imageio.imsave(dir + '/results/' + method + '/' + data_name + img_name, maps, vmax=1, vmin=-1)
+        logpath = f'{dir}/results/{vid_idx}'
+        os.makedirs(logpath, exist_ok=True)
+        imageio.imsave(f'{logpath}/{frame_idx}.jpg', maps, vmax=1, vmin=-1)

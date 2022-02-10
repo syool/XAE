@@ -11,13 +11,19 @@ class Model(nn.Module):
 
     def forward(self, x):
         z, skip = self.encoder(x)
-        z, _ = self.memory(z)
+        z, att = self.memory(z)
         x = self.decoder(z, skip)
 
-        return x
+        return x, att
     
     def relprop(self, R, alpha):
         R = self.memory.relprop(R, alpha)
         R = self.encoder.relprop(R, alpha)
+        
+        return R
+    
+    def RAP_relprop(self, R):
+        R = self.memory.RAP_relprop(R)
+        R = self.encoder.RAP_relprop(R)
         
         return R

@@ -50,7 +50,7 @@ class Train():
                 
                 optimizer.zero_grad()
                 
-                output = net(frame[:,:-3]) # frame[:,:-3] -> frame clip
+                output, _ = net(frame[:,:-3]) # frame[:,:-3] -> frame clip
                 loss = MSE(output, frame[:,-3:]) # frame[:,-3:] -> future frame
                 
                 loss.backward()

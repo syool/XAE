@@ -61,3 +61,17 @@ class Encoder(nn.Module):
         R = self.conv1.relprop(R, alpha)
         
         return R
+    
+    def RAP_relprop(self, R):
+        R = self.conv4.RAP_relprop(R)
+        
+        R = self.pool3.RAP_relprop(R)
+        R = self.conv3.RAP_relprop(R)
+        
+        R = self.pool2.RAP_relprop(R)
+        R = self.conv2.RAP_relprop(R)
+        
+        R = self.pool1.RAP_relprop(R)
+        R = self.conv1.RAP_relprop(R)
+        
+        return R

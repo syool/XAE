@@ -1,5 +1,5 @@
 import argparse
-from src import Train, Test
+from src import Train, Test, Interpret
 
 
 if __name__ == '__main__':
@@ -26,6 +26,9 @@ if __name__ == '__main__':
                         help='set seed for random numbers')
     parser.add_argument('--train', action='store_const', const='train') # default='train'
     parser.add_argument('--inference', action='store_const', const='inference') # default='inference'
+    parser.add_argument('--LRP', action='store_const', const='LRP', default='LRP') # default='LRP'
+    parser.add_argument('--RAP', action='store_const', const='RAP') # default='RAP'
+
 
     args = parser.parse_args()
 
@@ -33,5 +36,7 @@ if __name__ == '__main__':
         Train(args).run()
     elif args.inference:
         Test(args).run()
+    elif args.LRP or args.RAP:
+        Interpret(args).run()
     else:
         print('Missing argument: --train or --inference?')

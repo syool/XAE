@@ -26,7 +26,7 @@ class Memory(nn.Module):
         
         # == GET QUERIES ==
         input = input.permute(0, 2, 3, 1)
-            
+        
         input = input.contiguous()
         query = input.view(-1, shape[1])
         
@@ -35,22 +35,37 @@ class Memory(nn.Module):
         
         # == Top-K SELECTION ==
         val, idx = torch.topk(att, k=self.k, dim=1)
-        val = F.softmax(val, dim=1)
-        att = torch.zeros_like(att).scatter_(1, idx, val)
+        if self.training:
+            val = F.softmax(val, dim=1)
+        else:
+            val = torch.ones_like(val)
+        attvec = torch.zeros_like(att).scatter_(1, idx, val)
         
         # == MEMORY SELECTION ==
         mempool_T = self.linear.weight.permute(1, 0)
-        output = F.linear(att, mempool_T)
+        output = F.linear(attvec, mempool_T)
         
         # == RECOVER DIMENSIONALITY ==
         output = output.view(shape[0], shape[2], shape[3], shape[1])
         output = output.permute(0, 3, 1, 2)
-            
-        return output, att
+        
+        return output, attvec*att
     
     def relprop(self, R, alpha):
-        # additional inverted sequences -> softmax & topk?
-        R = self.linear.relprop(R, alpha) # invert: self.linear(query)
+        # TODO: improve lrp algorithm
+        
+        # * GOAL: activate prototyical normality patterns
+        # * deactivate abonormal patterns never seen before
+        
+        # ? additional inverted sequences -> softmax & topk?
+        R = self.linear.relprop(R, alpha)
+        R = R.view(1, 32, 32, 512) # invert: input.view(-1, shape[1])
+        R = R.permute(0, 3, 1, 2) # invert: input.permute(0, 2, 3, 1)
+        
+        return R
+    
+    def RAP_relprop(self, R):
+        R = self.linear.RAP_relprop(R)
         R = R.view(1, 32, 32, 512) # invert: input.view(-1, shape[1])
         R = R.permute(0, 3, 1, 2) # invert: input.permute(0, 2, 3, 1)
         
