@@ -53,11 +53,13 @@ class Memory(nn.Module):
     
     def relprop(self, R, alpha):
         # TODO: improve lrp algorithm
-        
-        # * GOAL: activate prototyical normality patterns
-        # * deactivate abonormal patterns never seen before
-        
-        # ? additional inverted sequences -> softmax & topk?
+            # * activate prototyical normality patterns
+            # * deactivate abonormal patterns never seen before
+        # @ IDEA: R originates from the saliency attention, not memory
+            # @ opt1 should it use two-branched encoder?
+            # @ opt2 attention u-net?
+            # @ opt3 just print coefficient maps
+
         R = self.linear.relprop(R, alpha)
         R = R.view(1, 32, 32, 512) # invert: input.view(-1, shape[1])
         R = R.permute(0, 3, 1, 2) # invert: input.permute(0, 2, 3, 1)
