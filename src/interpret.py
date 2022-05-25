@@ -25,7 +25,7 @@ class Interpret():
         self.args = args
         
     def run(self):
-        pth = 'mem200_batch8_mem20_5_run02-08_04:53PM.pth'
+        pth = 'mem200_batch8_seeds0_clip20_run02-16_05:57PM.pth'
         
         print(f'interpret on {self.args.dataset}: {pth}...')
         

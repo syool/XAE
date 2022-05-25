@@ -83,12 +83,11 @@ def enlarge_image(img, scaling = 3):
     return out
 
 
-def hm_to_rgb(R, scaling = 3, cmap = 'bwr', normalize = True):
-    cmap = eval('matplotlib.cm.{}'.format(cmap))
+def hm_to_rgb(R: torch.tensor, scaling: int, cmap: str, normalize: bool = True):
+    cmap = eval(f'matplotlib.cm.{cmap}')
     if normalize:
         R = R / np.max(np.abs(R)) # normalize to [-1,1] wrt to max relevance magnitude
-        R = (R + 1.)/2. # shift/normalize to [0,1] for color mapping
-    R = R
+        # R = (R + 1.)/2. # shift/normalize to [0,1] for color mapping
     R = enlarge_image(R, scaling)
     rgb = cmap(R.flatten())[...,0:3].reshape([R.shape[0],R.shape[1],3])
     
@@ -100,7 +99,7 @@ def visualize(relevances, dir, vid_idx, frame_idx):
     heatmap = np.sum(relevances, axis=3)
     heatmaps = []
     for heat in heatmap:
-        maps = (hm_to_rgb(heat, scaling=3, cmap='seismic')*255).astype(np.uint8)
+        maps = (hm_to_rgb(heat, scaling=3, cmap='afmhot')*255).astype(np.uint8)
         heatmaps.append(maps)
         logpath = f'{dir}/results/{vid_idx}'
         os.makedirs(logpath, exist_ok=True)
